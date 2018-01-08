@@ -33,7 +33,7 @@ RUN apt-get update -qq && apt-get install -qqy wget curl git iptables ca-certifi
 # for jenkins
 RUN echo deb http://pkg.jenkins.io/debian-stable binary/ >> /etc/apt/sources.list \
     && wget -q -O - http://pkg.jenkins.io/debian-stable/jenkins.io.key | apt-key add -
-RUN apt-get update -qq && apt-get install -y jenkins=2.100
+RUN apt-get update -qq && apt-get install -y jenkins=2.98
 
 # now we install docker in docker - thanks to https://github.com/jpetazzo/dind
 # We install newest docker into our docker in docker container
