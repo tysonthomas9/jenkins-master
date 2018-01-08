@@ -1,5 +1,8 @@
 #!/bin/bash
-
+docker daemon -H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock &
+echo $?
+echo "start docker daemon................"
+sleep 5s
 # If we have docker bind mounted in - no need.
 if (docker version); then
 	echo "Docker is already bind mounted in - we are good to go..."
@@ -12,10 +15,10 @@ echo "Launching docker server DND style..."
 # First, make sure that cgroups are mounted correctly.
 CGROUP=/sys/fs/cgroup
 
-[ -d $CGROUP ] || 
+[ -d $CGROUP ] ||
 	mkdir $CGROUP
 
-mountpoint -q $CGROUP || 
+mountpoint -q $CGROUP ||
 	mount -n -t tmpfs -o uid=0,gid=0,mode=0755 cgroup $CGROUP || {
 		echo "Could not make a tmpfs mount. Did you use --privileged?"
 		exit 1
@@ -33,7 +36,7 @@ fi
 for SUBSYS in $(cut -d: -f2 /proc/1/cgroup)
 do
         [ -d $CGROUP/$SUBSYS ] || mkdir $CGROUP/$SUBSYS
-        mountpoint -q $CGROUP/$SUBSYS || 
+        mountpoint -q $CGROUP/$SUBSYS ||
                 mount -n -t cgroup -o $SUBSYS cgroup $CGROUP/$SUBSYS
 
         # The two following sections address a bug which manifests itself
@@ -90,6 +93,8 @@ popd >/dev/null
 # If a pidfile is still around (for example after a container restart),
 # delete it so that docker can start.
 rm -rf /var/run/docker.pid
-
+echo "remove docker pid"
 docker -d &
+echo "executed docker -d"
 exec "$@"
+echo "END of script ......."
